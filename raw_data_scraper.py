@@ -1,8 +1,8 @@
 import pandas
+
 bracket = ["Alabama Crimson Tide","Texas A&M-Corpus Christi Islanders","Maryland Terrapins","West Virginia Mountaineers","San Diego State Aztecs","Charleston Cougars","Virginia Cavaliers","Furman Paladins","Creighton Bluejays","NC State Wolfpack","Baylor Bears","UC Santa Barbara Gauchos","Missouri Tigers","Utah State Aggies","Arizona Wildcats","Princeton Tigers","Houston Cougars","Northern Kentucky Norse","Iowa Hawkeyes","Auburn Tigers","Miami Hurricanes","Drake Bulldogs","Indiana Hoosiers","Kentucky Wildcats","Iowa State Cyclones","Pittsburgh Panthers","Xavier Musketeers","Kennesaw State Owls","Texas A&M Aggies","Penn State Nittany Lions","Texas Longhorns","Colgate Raiders","Purdue Boilermakers","Fairleigh Dickinson Knights","Memphis Tigers","Florida Atlantic Owls","Duke Blue Devils","Oral Roberts Golden Eagles","Tennessee Volunteers","Louisiana Ragin' Cajuns","Kentucky Wildcats","Providence Friars","Kansas State Wildcats","Montana State Bobcats","Michigan State Spartans","USC Trojans","Marquette Golden Eagles","Vermont Catamounts","Kansas Jayhawks","Howard Bison","Arkansas Razorbacks","Illinois Fighting Illini","Saint Mary's Gaels","VCU Rams","UConn Huskies","Iona Gaels","TCU Horned Frogs","Arizona State Sun Devils","Gonzaga Bulldogs","Grand Canyon Lopes","Northwestern Wildcats","Boise State Broncos","UCLA Bruins","UNC Asheville Bulldogs"]
 real = [["Alabama Crimson Tide","Maryland Terrapins","San Diego State Aztecs","Furman Paladins","Creighton Bluejays","Baylor Bears","Missouri Tigers","Princeton Tigers","Houston Cougars","Auburn Tigers","Miami Hurricanes","Indiana Hoosiers","Pittsburgh Panthers","Xavier Musketeers","Penn State Nittany Lions","Texas Longhorns","Fairleigh Dickinson Knights","Florida Atlantic Owls","Duke Blue Devils","Tennessee Volunteers","Kentucky Wildcats","Kansas State Wildcats","Michigan State Spartans","Marquette Golden Eagles","Kansas Jayhawks","Arkansas Razorbacks","Saint Mary's Gaels","UConn Huskies","TCU Horned Frogs","Gonzaga Bulldogs","Northwestern Wildcats","UCLA Bruins"],["Alabama Crimson Tide","San Diego State Aztecs","Creighton Bluejays","Princeton Tigers","Houston Cougars","Miami Hurricanes","Xavier Musketeers","Texas Longhorns","Florida Atlantic Owls","Tennessee Volunteers","Kansas State Wildcats","Michigan State Spartans","Arkansas Razorbacks","UConn Huskies","Gonzaga Bulldogs","UCLA Bruins"],["San Diego State Aztecs","Creighton Bluejays","Miami Hurricanes","Texas Longhorns","Florida Atlantic Owls","Kansas State Wildcats","UConn Huskies","Gonzaga Bulldogs"],["San Diego State Aztecs","Miami Hurricanes","Florida Atlantic Owls","UConn Huskies"],["San Diego State Aztecs","UConn Huskies"],["Uconn Huskies"]]
 
-print(bracket)
 df = pandas.read_excel("2023_data.xlsx")
 def EffFGP(row):
     return((row["FGM"]+(.5*row["3PM"]))/row["FGA"])
@@ -14,6 +14,8 @@ def TurnoverRate(row):
 def FreeThrowRate(row):
     return(row["FTA"]/row["FGA"])
 
+print(df)
+
 df["Effective Field Goal %"] = df.apply(EffFGP, axis = 1)
 df["Rebound Rate"] = df.apply(RebRate, axis = 1)
 df["Turnover Rate"] = df.apply(TurnoverRate, axis = 1)
@@ -22,6 +24,8 @@ df["Free Throw Rate"] = df.apply(FreeThrowRate, axis = 1)
 desired_columns = ['TEAM', 'Turnover Rate']
 criteria_df = df.loc[:, desired_columns]
 print(criteria_df)
+seed_columns = ['RK','TEAM']
+seed_df = df.loc[:, seed_columns]
 def compare_teams(team1, team2, criteria_df):
     # Compare teams based on criteria
     team1_criteria = criteria_df.loc[criteria_df['TEAM'] == team1].iloc[:, 1:].values.flatten()
@@ -29,6 +33,16 @@ def compare_teams(team1, team2, criteria_df):
     
     # Return the team with the higher total criteria values
     return team1 if sum(team1_criteria) > sum(team2_criteria) else team2
+
+def compare_seeds(team1, team2, ranks_df):
+    # Compare teams based on criteria
+    team1row = row = ranks_df.loc[ranks_df['TEAM'] == team1]
+    team2row = row = ranks_df.loc[ranks_df['TEAM'] == team2]
+    r1 = team1row['RK'].values[0]
+    r2 = team2row['RK'].values[0]
+    
+    # Return the team with the higher total criteria values
+    return team2 if r1 > r2 else team1
 
 # def normalize_column(column):
 #     min_val = column.min()
